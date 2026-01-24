@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:task5/constants.dart';
+import 'package:task5/core/constants/constants.dart';
+import 'package:task5/features/auth/views/login_view.dart';
+import 'package:task5/features/auth/views/register_view.dart';
 
 class Onboardingscreen extends StatelessWidget {
   const Onboardingscreen({super.key});
@@ -59,9 +61,28 @@ class Onboardingscreen extends StatelessWidget {
                 SizedBox(height: 20),
                 Row(
                   children: [
-                    CustomButtom(text: 'Login'),
+                    CustomButtom(
+                      text: 'Login',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginView()),
+                        );
+                      },
+                    ),
                     SizedBox(width: 20),
-                    CustomButtom(text: 'Signup', isTransparent: true),
+                    CustomButtom(
+                      text: 'Signup',
+                      isTransparent: true,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RegisterView(),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ],
@@ -78,9 +99,11 @@ class CustomButtom extends StatelessWidget {
     super.key,
     this.isTransparent = false,
     required this.text,
+    this.onPressed,
   });
   final bool isTransparent;
   final String text;
+  final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -97,7 +120,8 @@ class CustomButtom extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
           ),
         ),
-        onPressed: () {},
+        onPressed: onPressed,
+
         child: Text(
           text,
           style: h2.copyWith(
