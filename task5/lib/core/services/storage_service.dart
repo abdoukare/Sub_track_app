@@ -3,7 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 class StorageService extends GetxService {
   var _box;
-  static const String _tokenKey = 'auth_token';
+  final String _tokenKey = 'auth_token';
 
   Future<StorageService> init() async {
     _box = await Hive.openBox('app_storage');
