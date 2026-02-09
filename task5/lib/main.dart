@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task5/core/network/api_client.dart';
+import 'package:task5/core/routes/app_pages.dart';
+import 'package:task5/core/routes/app_routes.dart';
 import 'package:task5/core/services/storage_service.dart';
 import 'package:task5/data/repositories/auth_repo.dart';
 import 'features/auth/views/OnboardingScreen.dart';
 
-void main() {
-  // Register services with GetX BEFORE running the app
-  _setupServices();
+void main() async {
+  // Initialize Hive and setup services BEFORE running the app
+  await _setupServices();
   runApp(const MyApp());
 }
 
-void _setupServices() {
-  // 1. Register StorageService (singleton)
-  Get.put<StorageService>(StorageService());
+Future<void> _setupServices() async {
+  // 1. Initialize and Register StorageService (singleton)
+  final storageService = StorageService();
+  await storageService.init();
+  Get.put<StorageService>(storageService);
 
   // 2. Register ApiClient (depends on StorageService)
   Get.put<ApiClient>(ApiClient());
@@ -32,10 +36,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Subscription Tracker',
       home: const Onboardingscreen(),
+      initialRoute: AppRoutes.onboarding,
+      getPages: AppPages.routes,
     );
   }
 }
