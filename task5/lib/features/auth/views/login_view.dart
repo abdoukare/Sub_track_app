@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task5/core/constants/constants.dart';
+import 'package:task5/features/auth/viewmodels/auth_controller.dart';
 import 'package:task5/features/auth/viewmodels/login_viewmodel.dart';
 import 'package:task5/data/repositories/auth_repo.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.put(AuthController());
     return Scaffold(
       body: GetBuilder<LoginViewmodel>(
         init: LoginViewmodel(Get.find<AuthRepo>()),
@@ -106,35 +108,27 @@ class LoginView extends StatelessWidget {
                       ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primary,
-                          foregroundColor: white,
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: controller.isLoading
-                            ? null
-                            : () => controller.login(),
-                        child: controller.isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
+                      child: Obx(() {
+                        return authController.isLoading.value
+                            ? CircularProgressIndicator()
+                            : ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primary,
+                                  foregroundColor: white,
+                                  minimumSize: const Size(double.infinity, 50),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                              )
-                            : const Text(
-                                "Sign in",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      ),
+                                onPressed: () {
+                                  authController.login(
+                                    controller.emailController.text,
+                                    controller.passwordController.text,
+                                  );
+                                },
+                                child: const Text("Login"),
+                              );
+                      }),
                     ),
                     const SizedBox(height: 10),
                     GestureDetector(
@@ -144,9 +138,7 @@ class LoginView extends StatelessWidget {
                       },
                       child: const Text(
                         "Create a new account",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
                     const SizedBox(height: 20),
