@@ -6,6 +6,7 @@ class StorageService extends GetxService {
   final String _tokenKey = 'auth_token';
 
   Future<StorageService> init() async {
+    await Hive.initFlutter();
     _box = await Hive.openBox('app_storage');
     return this;
   }
