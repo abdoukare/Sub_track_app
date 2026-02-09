@@ -23,12 +23,30 @@ class ApiClient {
     required String email,
     required String password,
   }) async {
-    final response = await http.post(
-      Uri.parse(AppLinkApi.logIn),
-      headers: _getHeader(),
-      body: jsonEncode({'email': email, 'password': password}),
-    );
-    return _handleResponse(response);
+    final uri = Uri.parse(AppLinkApi.logIn);
+
+    print('Requeste');
+    print('URI: $uri');
+    print('Headers: ${_getHeader()}');
+    print('Body: ${jsonEncode({'email': email, 'password': password})}');
+    try {
+      final response = await http.post(
+        uri,
+        headers: _getHeader(),
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+
+      print('RESPONSE');
+      print('STATUS CODE: ${response.statusCode}');
+      print('RAW BODY: ${response.body}');
+      print('HEADERS: ${response.headers}');
+
+      return _handleResponse(response);
+    } catch (e) {
+      print(' HTTP ERROR');
+      print(e.toString());
+      rethrow;
+    }
   }
 
   Future<Map<String, dynamic>> register({
