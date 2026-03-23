@@ -1,5 +1,12 @@
+import 'dart:async';
 import 'package:task5/core/services/storage_service.dart';
 import '../../core/network/api_client.dart';
+/*
+  THIS FILE IS FULL OF ERRORS . 
+  BUG 1 => Unusual Response Format (Data as Array)
+    f  backend returns { data: { user: {...}, token: "..." } } instead of array, the app crashes.
+  Missing Token Extraction Logic => the ser info is not stored is lost 
+*/
 
 class AuthRepo {
   final ApiClient apiClient;
@@ -7,21 +14,28 @@ class AuthRepo {
   AuthRepo({required this.apiClient, required this.storageService});
 
   // login
-  Future<void> Login({required String email, required String password}) async {
+  Future<Map<String, dynamic>> Login({
+    required String email,
+    required String password,
+  }) async {
     final response = await apiClient.login(email: email, password: password);
-    print("Response from backend: $response");
 
-    // Backend returns: { success, message, data: [user, token] }
-    final dataList = response['data'] as List;
-    final token = dataList[1] as String;
+    // backend reponse is {successs, msg, data:[user, token]}
+    final data = response['data'];
+    if (data is List && data.length >= 2) {
+      final user = data[0] as String;
+      final token = data[1] as String;
 
-    print("Token extracted: $token");
-    await storageService.saveToken(token);
+      await storageService.saveToken(token);
+      await storageService.saveUser(user as Map<String, dynamic>);
+
+      return {'user': user, 'token': token};
+    }
+    throw Exception('Invalid response format');
   }
 
-  // Register
-
-  Future<bool> register({
+  // Register Sign-up (returns object)
+  Future<Map<String, dynamic>> register({
     required String name,
     required String email,
     required String password,
@@ -31,14 +45,15 @@ class AuthRepo {
       email: email,
       password: password,
     );
-    print("Response from backend: $response");
+    final data = response['data'];
+    if (data is Map<String, dynamic>) {
+      final user = data['user'] as String;
+      final token = data['token'] as String;
 
-    // Backend returns: { success, message, data: [user, token] }
-    final dataList = response['data'] as List;
-    final token = dataList[1] as String;
-
-    print("Token extracted: $token");
-    await storageService.saveToken(token);
-    return token.isNotEmpty;
+      await storageService.saveToken(token);
+      await storageService.saveUser(user as Map<String, dynamic>);
+      return {'user': user, 'token': token};
+    }
+    throw Exception('Invalid response format');
   }
 }

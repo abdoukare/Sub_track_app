@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:task5/features/auth/views/OnboardingScreen.dart';
-import 'package:task5/features/subscriptions/viewmodels/home.dart';
+import 'package:task5/features/subscriptions/views/home_view.dart';
 import 'package:task5/features/auth/views/login_view.dart';
 
 class AppPages {

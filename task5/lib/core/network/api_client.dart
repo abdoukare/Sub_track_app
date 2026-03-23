@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:task5/core/constants/app_api_links.dart';
@@ -25,10 +26,10 @@ class ApiClient {
   }) async {
     final uri = Uri.parse(AppLinkApi.logIn);
 
-    print('Requeste');
-    print('URI: $uri');
-    print('Headers: ${_getHeader()}');
-    print('Body: ${jsonEncode({'email': email, 'password': password})}');
+    debugPrint('Requeste');
+    debugPrint('URI: $uri');
+    debugPrint('Headers: ${_getHeader()}');
+    debugPrint('Body: ${jsonEncode({'email': email, 'password': password})}');
     try {
       final response = await http.post(
         uri,
@@ -36,15 +37,15 @@ class ApiClient {
         body: jsonEncode({'email': email, 'password': password}),
       );
 
-      print('RESPONSE');
-      print('STATUS CODE: ${response.statusCode}');
-      print('RAW BODY: ${response.body}');
-      print('HEADERS: ${response.headers}');
+      debugPrint('RESPONSE');
+      debugPrint('STATUS CODE: ${response.statusCode}');
+      debugPrint('RAW BODY: ${response.body}');
+      debugPrint('HEADERS: ${response.headers}');
 
       return _handleResponse(response);
     } catch (e) {
-      print(' HTTP ERROR');
-      print(e.toString());
+      debugPrint(' HTTP ERROR');
+      debugPrint(e.toString());
       rethrow;
     }
   }
@@ -74,6 +75,29 @@ class ApiClient {
         message: error['message'] ?? 'An error occured!',
         statusCode: response.statusCode,
       );
+    }
+  }
+
+  Future<List<dynamic>> getSubscriptions(String userId) async {
+    final uri = Uri.parse('${AppLinkApi.getSubscriptions}/$userId');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: _getHeader(requiresAuth: true), // ✅ Need auth token
+      );
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final data = jsonDecode(response.body);
+        return data['data'] as List;
+      } else {
+        throw ApiException(
+          message: jsonDecode(response.body)['error'] ?? 'Failed to fetch',
+          statusCode: response.statusCode,
+        );
+      }
+    } catch (e) {
+      debugPrint('Error :  $e');
+      rethrow;
     }
   }
 }
